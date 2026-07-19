@@ -1,0 +1,407 @@
+{
+  "info": {
+    "_postman_id": "b7e2a1a0-4f3c-4a7a-9d8b-ecommerce-api-v2",
+    "name": "E-Commerce API",
+    "description": "Matches the Week 11 capstone spec exactly: base URL variable is 'url' (http://localhost:3000/api/v1), PUT for updates, flat /cart routes, and paymentMethod on order creation. Cart/Order requests auto-capture the guest session id (x-session-id) so you don't have to copy it by hand.\n\nWorkflow: Create Category -> Create Product -> Add Product to Cart -> Get User Cart -> Create Order.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "event": [
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Auto-capture the guest session id whenever the server issues a new one",
+          "const newSessionId = pm.response.headers.get('x-session-id');",
+          "if (newSessionId) {",
+          "    pm.collectionVariables.set('sessionId', newSessionId);",
+          "}"
+        ]
+      }
+    }
+  ],
+  "variable": [
+    { "key": "url", "value": "http://localhost:3000/api/v1", "type": "string" },
+    { "key": "sessionId", "value": "", "type": "string" },
+    { "key": "categoryId", "value": "", "type": "string" },
+    { "key": "productId", "value": "", "type": "string" },
+    { "key": "orderId", "value": "", "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "Categories",
+      "item": [
+        {
+          "name": "Get All Categories",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url}}/categories",
+              "host": ["{{url}}"],
+              "path": ["categories"]
+            }
+          }
+        },
+        {
+          "name": "Get Category by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url}}/categories/{{categoryId}}",
+              "host": ["{{url}}"],
+              "path": ["categories", "{{categoryId}}"]
+            }
+          }
+        },
+        {
+          "name": "Create Category",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const data = pm.response.json();",
+                  "    if (data.data && data.data._id) {",
+                  "        pm.collectionVariables.set('categoryId', data.data._id);",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Electronics\",\n  \"slug\": \"electronics\",\n  \"description\": \"Tech stuff\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{url}}/categories",
+              "host": ["{{url}}"],
+              "path": ["categories"]
+            }
+          }
+        },
+        {
+          "name": "Update Category",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Electronics & Gadgets\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{url}}/categories/{{categoryId}}",
+              "host": ["{{url}}"],
+              "path": ["categories", "{{categoryId}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete Category",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{url}}/categories/{{categoryId}}",
+              "host": ["{{url}}"],
+              "path": ["categories", "{{categoryId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Products",
+      "item": [
+        {
+          "name": "Get All Products",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url}}/products?category=&minPrice=&maxPrice=&inStock=true&search=",
+              "host": ["{{url}}"],
+              "path": ["products"],
+              "query": [
+                { "key": "category", "value": "", "disabled": true },
+                { "key": "minPrice", "value": "", "disabled": true },
+                { "key": "maxPrice", "value": "", "disabled": true },
+                { "key": "inStock", "value": "true", "disabled": true },
+                { "key": "search", "value": "", "disabled": true }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Product by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url}}/products/{{productId}}",
+              "host": ["{{url}}"],
+              "path": ["products", "{{productId}}"]
+            }
+          }
+        },
+        {
+          "name": "Create Product",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const data = pm.response.json();",
+                  "    if (data.data && data.data._id) {",
+                  "        pm.collectionVariables.set('productId', data.data._id);",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"iPhone 14\",\n  \"description\": \"Latest Apple smartphone\",\n  \"price\": 799,\n  \"stock\": 10,\n  \"category\": \"{{categoryId}}\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{url}}/products",
+              "host": ["{{url}}"],
+              "path": ["products"]
+            }
+          }
+        },
+        {
+          "name": "Update Product",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"price\": 749,\n  \"stock\": 15\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{url}}/products/{{productId}}",
+              "host": ["{{url}}"],
+              "path": ["products", "{{productId}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete Product",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{url}}/products/{{productId}}",
+              "host": ["{{url}}"],
+              "path": ["products", "{{productId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Cart",
+      "description": "All requests send x-session-id: {{sessionId}}, auto-filled by the collection test script after your first request.",
+      "item": [
+        {
+          "name": "Get User Cart",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "x-session-id", "value": "{{sessionId}}", "type": "text" }
+            ],
+            "url": {
+              "raw": "{{url}}/cart",
+              "host": ["{{url}}"],
+              "path": ["cart"]
+            }
+          }
+        },
+        {
+          "name": "Add Product to Cart",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "x-session-id", "value": "{{sessionId}}", "type": "text" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productId\": \"{{productId}}\",\n  \"quantity\": 1\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{url}}/cart",
+              "host": ["{{url}}"],
+              "path": ["cart"]
+            }
+          }
+        },
+        {
+          "name": "Update Cart Item Quantity",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "x-session-id", "value": "{{sessionId}}", "type": "text" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"quantity\": 2\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{url}}/cart/{{productId}}",
+              "host": ["{{url}}"],
+              "path": ["cart", "{{productId}}"]
+            }
+          }
+        },
+        {
+          "name": "Remove Item from Cart",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "x-session-id", "value": "{{sessionId}}", "type": "text" }
+            ],
+            "url": {
+              "raw": "{{url}}/cart/{{productId}}",
+              "host": ["{{url}}"],
+              "path": ["cart", "{{productId}}"]
+            }
+          }
+        },
+        {
+          "name": "Clear Cart",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "x-session-id", "value": "{{sessionId}}", "type": "text" }
+            ],
+            "url": {
+              "raw": "{{url}}/cart",
+              "host": ["{{url}}"],
+              "path": ["cart"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Orders",
+      "description": "All requests send x-session-id: {{sessionId}}. Make sure the cart has items (Cart folder) before Create Order.",
+      "item": [
+        {
+          "name": "Create Order",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const data = pm.response.json();",
+                  "    if (data.data && data.data._id) {",
+                  "        pm.collectionVariables.set('orderId', data.data._id);",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "x-session-id", "value": "{{sessionId}}", "type": "text" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"shippingAddress\": {\n    \"street\": \"123 Main St\",\n    \"city\": \"Cairo\",\n    \"country\": \"Egypt\"\n  },\n  \"paymentMethod\": \"CASH\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{url}}/orders",
+              "host": ["{{url}}"],
+              "path": ["orders"]
+            }
+          }
+        },
+        {
+          "name": "Get User Orders",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "x-session-id", "value": "{{sessionId}}", "type": "text" }
+            ],
+            "url": {
+              "raw": "{{url}}/orders",
+              "host": ["{{url}}"],
+              "path": ["orders"]
+            }
+          }
+        },
+        {
+          "name": "Get Order by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "x-session-id", "value": "{{sessionId}}", "type": "text" }
+            ],
+            "url": {
+              "raw": "{{url}}/orders/{{orderId}}",
+              "host": ["{{url}}"],
+              "path": ["orders", "{{orderId}}"]
+            }
+          }
+        },
+        {
+          "name": "Update Order Status (bonus, not in spec)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "x-session-id", "value": "{{sessionId}}", "type": "text" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"confirmed\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{url}}/orders/{{orderId}}/status",
+              "host": ["{{url}}"],
+              "path": ["orders", "{{orderId}}", "status"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
