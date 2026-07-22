@@ -29,10 +29,11 @@ const errorHandler = (err, req, res, next) => {
       message: err.message,
     });
   }
-  console.error('ERROR:', err);
+console.error('ERROR:', err);
   return res.status(500).json({
     status: 'error',
     message: 'Something went wrong',
   });
 };
+
 module.exports = errorHandler;

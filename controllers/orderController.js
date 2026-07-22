@@ -28,8 +28,6 @@ exports.createOrder = asyncHandler(async (req, res) => {
     throw new AppError('Cart is empty', 400);
   }
  
-  // Step 2 + 3: for every item, make sure the product still exists and has
-  // enough stock, and calculate totalPrice server-side from the real product data
   const orderItems = [];
   let totalPrice = 0;
  
@@ -60,7 +58,6 @@ exports.createOrder = asyncHandler(async (req, res) => {
     totalPrice += product.price * item.quantity;
   }
  
-  // Step 4: create the order, saving name/price/quantity of every product
   const order = await Order.create({
     sessionId: req.sessionId,
     items: orderItems,
@@ -69,19 +66,16 @@ exports.createOrder = asyncHandler(async (req, res) => {
     paymentMethod,
   });
  
-  // Step 5: reduce the stock of every product by the requested quantity
   for (const item of orderItems) {
     await Product.findByIdAndUpdate(item.product, {
       $inc: { stock: -item.quantity },
     });
   }
- 
-  // Step 6: empty the cart
+
   cart.items = [];
   cart.totalPrice = 0;
   await cart.save();
  
-  // Step 7: return the new order
   sendResponse(res, 201, 'Order created successfully', order);
 });
  
