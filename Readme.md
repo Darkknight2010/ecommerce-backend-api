@@ -20,7 +20,7 @@ A RESTful backend API for an e-commerce platform, supporting category and produc
 ## Installation
 
 ```bash
-git clone https://github.com/Darkknight2010/ecommerce-backend-api.git
+git clone https://github.com/Darkknight2010/ecommerce-backend-api/tree/feature/final-review
 cd ecommerce-backend-api
 npm install
 ```
