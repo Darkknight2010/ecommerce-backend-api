@@ -2,7 +2,6 @@
   "info": {
     "_postman_id": "b7e2a1a0-4f3c-4a7a-9d8b-ecommerce-api-v2",
     "name": "E-Commerce API",
-    "description": "Matches the Week 11 capstone spec exactly: base URL variable is 'url' (http://localhost:3000/api/v1), PUT for updates, flat /cart routes, and paymentMethod on order creation. Cart/Order requests auto-capture the guest session id (x-session-id) so you don't have to copy it by hand.\n\nWorkflow: Create Category -> Create Product -> Add Product to Cart -> Get User Cart -> Create Order.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "event": [
@@ -80,7 +79,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Electronics\",\n  \"slug\": \"electronics\",\n  \"description\": \"Tech stuff\"\n}",
+              "raw": "{\n  \"name\": \"Home Appliances\",\n  \"slug\": \"home-appliances\",\n  \"description\": \"Kitchen and household appliances\"\n}",
               "options": { "raw": { "language": "json" } }
             },
             "url": {
@@ -99,7 +98,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Electronics & Gadgets\"\n}",
+              "raw": "{\n  \"name\": \"Home Appliances & Kitchenware\"\n}",
               "options": { "raw": { "language": "json" } }
             },
             "url": {
